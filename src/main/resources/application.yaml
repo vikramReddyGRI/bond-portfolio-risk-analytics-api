@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: Bond Portfolio Risk Analytics API

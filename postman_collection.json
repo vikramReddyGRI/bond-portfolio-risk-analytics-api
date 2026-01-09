@@ -1,0 +1,156 @@
+{
+  "info": {
+    "name": "Bond Portfolio Risk Analytics API - Collection",
+    "_postman_id": "bond-api-collection",
+    "description": "Collection with success and failure scenarios for all API endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "YTM - Success",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isin\": \"US0001\",\n  \"maturityDate\": \"2030-01-01\",\n  \"couponRate\": 0.05,\n  \"faceValue\": 1000.0,\n  \"marketPrice\": 975.0,\n  \"frequency\": \"ANNUAL\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/bonds/ytm",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bonds",
+            "ytm"
+          ]
+        }
+      },
+      "response": [],
+      "description": "Expected: returns a numeric YTM (e.g. 0.05 = 5%)."
+    },
+    {
+      "name": "YTM - Validation Failure (missing maturityDate)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isin\": \"X1\",\n  \"couponRate\": 0.05,\n  \"faceValue\": 1000.0,\n  \"marketPrice\": 980.0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/bonds/ytm",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "bonds",
+            "ytm"
+          ]
+        }
+      },
+      "response": [],
+      "description": "Expected: 400 Bad Request with JSON mapping field -> message (e.g. maturityDate must not be blank)."
+    },
+    {
+      "name": "Duration - Success",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"isin\": \"US0001\",\n  \"maturityDate\": \"2030-01-01\",\n  \"couponRate\": 0.05,\n  \"faceValue\": 1000.0,\n  \"marketPrice\": 975.0,\n  \"frequency\": \"ANNUAL\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/bonds/duration", "host": ["{{baseUrl}}"], "path": ["api","bonds","duration"] }
+      },
+      "response": [],
+      "description": "Expected: returns Macaulay duration in years (numeric)."
+    },
+    {
+      "name": "Modified Duration - Success",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"isin\": \"US0001\",\n  \"maturityDate\": \"2030-01-01\",\n  \"couponRate\": 0.05,\n  \"faceValue\": 1000.0,\n  \"marketPrice\": 975.0,\n  \"frequency\": \"ANNUAL\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/bonds/modified-duration", "host": ["{{baseUrl}}"], "path": ["api","bonds","modified-duration"] }
+      },
+      "response": [],
+      "description": "Expected: returns modified duration numeric."
+    },
+    {
+      "name": "Portfolio Duration - Success",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": {
+          "mode": "raw",
+          "raw": "[\n  {\n    \"isin\": \"BOND1\",\n    \"maturityDate\": \"2027-01-01\",\n    \"couponRate\": 0.04,\n    \"faceValue\": 1000.0,\n    \"marketPrice\": 980.0,\n    \"frequency\": \"ANNUAL\"\n  },\n  {\n    \"isin\": \"BOND2\",\n    \"maturityDate\": \"2033-01-01\",\n    \"couponRate\": 0.06,\n    \"faceValue\": 1000.0,\n    \"marketPrice\": 1020.0,\n    \"frequency\": \"ANNUAL\"\n  }\n]"
+        },
+        "url": { "raw": "{{baseUrl}}/api/bonds/portfolio/duration", "host": ["{{baseUrl}}"], "path": ["api","bonds","portfolio","duration"] }
+      },
+      "response": [],
+      "description": "Expected: numeric portfolio weighted average modified duration."
+    },
+    {
+      "name": "Portfolio Duration - Failure (invalid payload)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{ \"not\": \"an array\" }" },
+        "url": { "raw": "{{baseUrl}}/api/bonds/portfolio/duration", "host": ["{{baseUrl}}"], "path": ["api","bonds","portfolio","duration"] }
+      },
+      "response": [],
+      "description": "Expected: 400 Bad Request or 500 depending on parsing; shows error handling for invalid payload."
+    },
+    {
+      "name": "Portfolio Load - Success",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": {
+          "mode": "raw",
+          "raw": "[\n  {\n    \"isin\": \"BOND1\",\n    \"maturityDate\": \"2027-01-01\",\n    \"couponRate\": 0.04,\n    \"faceValue\": 1000.0,\n    \"marketPrice\": 980.0,\n    \"frequency\": \"ANNUAL\"\n  }\n]"
+        },
+        "url": { "raw": "{{baseUrl}}/api/bonds/portfolio/load", "host": ["{{baseUrl}}"], "path": ["api","bonds","portfolio","load"] }
+      },
+      "response": [],
+      "description": "Expected: returns parsed Portfolio JSON with bonds array."
+    },
+    {
+      "name": "Portfolio Load - Failure (malformed JSON)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{ not: valid json }" },
+        "url": { "raw": "{{baseUrl}}/api/bonds/portfolio/load", "host": ["{{baseUrl}}"], "path": ["api","bonds","portfolio","load"] }
+      },
+      "response": [],
+      "description": "Expected: 400 Bad Request with message about invalid JSON."
+    },
+    {
+      "name": "YTM - Semi-Annual Success",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"isin\": \"SEMI1\",\n  \"maturityDate\": \"2030-01-01\",\n  \"couponRate\": 0.05,\n  \"faceValue\": 1000.0,\n  \"marketPrice\": 980.0,\n  \"frequency\": \"SEMI_ANNUAL\"\n}" },
+        "url": { "raw": "{{baseUrl}}/api/bonds/ytm", "host": ["{{baseUrl}}"], "path": ["api","bonds","ytm"] }
+      },
+      "response": [],
+      "description": "Semi-annual coupon example; expected numeric YTM (annualized)."
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" }
+  ]
+}
